@@ -41,7 +41,7 @@ model WorkspaceMember {
   workspaceId String
   userId      String
   role        Role      @default(MEMBER)
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   user        User      @relation(fields: [userId], references: [id])
 
   @@unique([workspaceId, userId]) // A user can't be in the same workspace twice
@@ -58,7 +58,7 @@ model Document {
   workspaceId String
   title       String
   content     String    @db.Text
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }

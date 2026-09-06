@@ -1,0 +1,120 @@
+# 🌌 Nexus | AI-Powered Collaborative Knowledge Workspace
+
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)](https://www.prisma.io/)
+[![Neon](https://img.shields.io/badge/Neon-PostgreSQL-00E599?logo=postgresql)](https://neon.tech/)
+[![Vercel AI](https://img.shields.io/badge/Vercel-AI SDK-000000?logo=vercel)](https://sdk.vercel.ai/)
+
+Nexus is a high-performance, production-grade SaaS platform designed to bridge the gap between structured documentation and real-time AI intelligence. It provides teams with a centralized hub to organize knowledge, collaborate in real-time, and leverage context-aware AI to accelerate productivity.
+
+**Built with a "Linear-inspired" design philosophy, focusing on extreme speed, minimalist aesthetics, and a professional user experience.**
+
+---
+
+## 🚀 Key Features
+
+### 🧠 Context-Aware AI Intelligence
+- **Streaming AI Chat**: Integrated Llama 3.3 (via Groq) providing real-time, streaming responses.
+- **Contextual Awareness**: The AI assistant doesn't just chat—it analyzes the active document's content to provide summaries, improvements, and brainstorm ideas.
+- **Prompt Engineering**: Pre-configured action chips for common tasks like "Summarize" and "Explain".
+
+### 👥 Professional Collaboration
+- **Hierarchical Workspaces**: Create dedicated hubs for different projects or teams.
+- **Real-time Sync**: Document changes are persisted instantly with a high-performance debounced autosave mechanism (1000ms).
+- **Role-Based Access**: Implemented `ADMIN`, `MEMBER`, and `VIEWER` roles to manage workspace permissions.
+
+### 🎨 Enterprise-Grade UI/UX
+- **3-Pane Architecture**: A sophisticated layout featuring a navigation sidebar, a focused writing area, and an integrated AI assistant.
+- **Glassmorphism Design**: Modern navigation and modals using backdrop-blur and semi-transparent surfaces.
+- **Fluid Animations**: Complex page transitions and micro-interactions powered by Framer Motion.
+- **Responsive Design**: Fully optimized for desktop, tablet, and mobile views.
+
+---
+
+## 🛠️ Technical Stack
+
+### Frontend
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS v4 (Design tokens, Custom themes)
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **State Management**: React Hooks, Vercel AI SDK (`useChat`)
+
+### Backend & Database
+- **Runtime**: Node.js / Next.js Server Actions & API Routes
+- **Database**: Neon PostgreSQL (Serverless)
+- **ORM**: Prisma
+- **Authentication**: JWT (jsonwebtoken) & bcryptjs for secure password hashing
+
+### AI Layer
+- **Orchestration**: Vercel AI SDK
+- **Model**: Llama 3.3 (via Groq Cloud)
+- **Pattern**: Streaming Server-Sent Events (SSE) for low-latency AI responses
+
+---
+
+## 🏗️ Technical Highlights (Engineering Decisions)
+
+### 1. Atomic Database Operations
+Implemented **Prisma Transactions** for workspace creation. This ensures that both the `Workspace` record and the initial `WorkspaceMember` (Admin) are created as a single atomic unit, preventing orphaned data in case of partial failures.
+
+### 2. Performance-First Persistence
+To avoid overwhelming the database with every keystroke, I implemented a **Debounced Autosave** logic. The editor tracks changes and only triggers a `PATCH` request after the user has stopped typing for 1000ms, significantly reducing API overhead.
+
+### 3. Modular UI Component Library
+Built a reusable atomic design system in `components/ui/` using the `asChild` pattern (via `@radix-ui/react-slot`). This allows for flexible component composition without adding unnecessary DOM nodes.
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+- Node.js v22+
+- A Neon PostgreSQL account
+- A Groq Cloud API Key
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/nexus.git
+   cd nexus
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   Create a `.env` file in the root directory:
+   ```env
+   DATABASE_URL="postgresql://..."
+   JWT_SECRET="your_super_secret_key"
+   GROQ_API_KEY="your_groq_api_key"
+   ```
+
+4. **Database Migration**
+   ```bash
+   npx prisma db push
+   ```
+
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+---
+
+## 🗺️ Roadmap
+- [ ] **Real-time Cursors**: Integration with WebSockets/Liveblocks for seeing where teammates are typing.
+- [ ] **Rich Text Editing**: Transitioning from a textarea to a block-based editor (Tiptap/Editor.js).
+- [ ] **AI-Powered Document Linking**: Automatically suggesting links to related documents within the workspace.
+- [ ] **Advanced Permissions**: Fine-grained document-level access control.
+
+---
+
+Developed with ❤️ by Surbhi Gupta

@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyToken } from "@/lib/auth";
@@ -24,28 +23,42 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Workspace name is required" }, { status: 400 });
     }
 
-    const slug = name.toLowerCase().replace(/\s+/g, "-");
+    const slug = name.toLowerCase().trim().replace(/\s+/g, "-");
 
-    const workspace = await db.workspace.create({
-      data: {
-        name: name,
-        slug: slug,
-        ownerId: decoded.userId,
-      },
+    // Use a transaction to ensure both workspace and member are created
+    const result = await db.$transaction(async (tx) => {
+      const workspace = await tx.workspace.create({
+        data: {
+          name: name,
+          slug: slug,
+          ownerId: decoded.userId,
+        },
+      });
+
+      await tx.workspaceMember.create({
+        data: {
+          workspaceId: workspace.id,
+          userId: decoded.userId,
+          role: "ADMIN",
+        },
+      });
+
+      return workspace;
     });
 
-    await db.workspaceMember.create({
-      data: {
-        workspaceId: workspace.id,
-        userId: decoded.userId,
-        role: "ADMIN",
-      },
-    });
+    return NextResponse.json({ message: "Workspace created!", workspace: result }, { status: 201 });
 
-    return NextResponse.json({ message: "Workspace created!", workspace }, { status: 201 });
-
-  } catch (error) {
+  } catch (error: any) {
     console.error("CREATE_WORKSPACE_ERROR:", error);
+
+    // Handle unique constraint violation for slug (Prisma error code P2002)
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { error: "A workspace with this name or slug already exists. Please try a different name." },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,7 +1,10 @@
-
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,21 +15,16 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage("Logging in...");
-
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
         headers: { "Content-Type": "application/json" },
       });
-
       if (response.ok) {
         const data = await response.json();
-        // Save the "Digital ID Card" (Token) to the browser's storage
         localStorage.setItem("token", data.token);
         setMessage("✅ Login successful! Redirecting...");
-
-        // Redirect to the dashboard (we will build this next!)
         router.push("/dashboard");
       } else {
         const data = await response.json();
@@ -38,42 +36,70 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white shadow-md rounded-lg w-96">
-        <h1 className="text-2xl font-bold mb-6 text-center">Welcome Back</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium">Email</label>
-            <input
-              type="email"
-              className="w-full p-2 border rounded mt-1 text-black"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden"
+      >
+        <div className="p-8 sm:p-12">
+          <div className="text-center mb-10">
+            <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl mx-auto mb-4">
+              N
+            </div>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome Back</h1>
+            <p className="text-slate-500 mt-2">Enter your details to access your workspace</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium">Password</label>
-            <input
-              type="password"
-              className="w-full p-2 border rounded mt-1 text-black"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 ml-1">Email Address</label>
+              <Input
+                type="email"
+                placeholder="name@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-1">
+                <label className="text-sm font-medium text-slate-700">Password</label>
+                <Link href="#" className="text-xs text-indigo-600 hover:underline">Forgot password?</Link>
+              </div>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full py-6 text-base" size="lg">
+              Sign In
+            </Button>
+          </form>
+
+          {message && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={`mt-6 text-center text-sm font-medium ${message.includes('✅') ? 'text-emerald-600' : 'text-rose-600'}`}
+            >
+              {message}
+            </motion.p>
+          )}
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-slate-500">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="text-indigo-600 font-semibold hover:underline">
+                Create one for free
+              </Link>
+            </p>
           </div>
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 transition"
-          >
-            Log In
-          </button>
-        </form>
-        {message && <p className="mt-4 text-center text-sm">{message}</p>}
-        <p className="mt-4 text-center text-xs text-gray-500">
-          Don't have an account? <a href="/signup" className="text-blue-600 underline">Sign up here</a>
-        </p>
-      </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
