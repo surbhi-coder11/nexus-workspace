@@ -5,10 +5,9 @@ import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [workspaces, setWorkspaces] = useState<any[]>([]); // Store the workspaces here
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
   const router = useRouter();
 
-  // Function to fetch workspaces from the API
   async function fetchWorkspaces() {
     const token = localStorage.getItem("token");
     try {
@@ -17,7 +16,6 @@ export default function DashboardPage() {
           "Authorization": `Bearer ${token}`
         },
       });
-
       if (response.ok) {
         const data = await response.json();
         setWorkspaces(data);
@@ -32,7 +30,7 @@ export default function DashboardPage() {
     if (!token) {
       router.push("/login");
     } else {
-      fetchWorkspaces(); // Fetch the workspaces when the page loads
+      fetchWorkspaces();
       setIsLoading(false);
     }
   }, [router]);
@@ -59,7 +57,7 @@ export default function DashboardPage() {
 
       if (response.ok) {
         alert("Workspace created successfully!");
-        await fetchWorkspaces(); // Refresh the list instead of reloading the whole page!
+        await fetchWorkspaces();
       } else {
         const data = await response.json();
         alert(`Error: ${data.error}`);
@@ -95,10 +93,11 @@ export default function DashboardPage() {
           <p className="text-gray-600 mb-8">Manage your projects and documents.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* 1. Map through the workspaces and show them as cards */}
+            {/* --- THIS IS THE PART WE UPDATED --- */}
             {workspaces.map((ws) => (
               <div
                 key={ws.id}
+                onClick={() => router.push(`/workspace/${ws.slug}`)} // Click to enter workspace!
                 className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -111,8 +110,8 @@ export default function DashboardPage() {
                 <p className="text-sm text-gray-500 mt-1">No documents yet</p>
               </div>
             ))}
+            {/* --- END OF UPDATE --- */}
 
-            {/* 2. The "Create" Button */}
             <div
               onClick={createWorkspace}
               className="p-6 bg-white border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-center h-40 hover:border-blue-400 transition cursor-pointer"
